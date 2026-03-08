@@ -174,21 +174,39 @@ curl http://localhost:5000/api/drives/1/scan/abc-123
 
 ---
 
-### Module 3 — Search & Duplicate Detection ⬜ Not started
+### Module 3 — Search & Duplicate Detection ✅ Done
 
-**Planned endpoints**
+**Implemented:** 2026-03-09
+
+#### API endpoints
 
 | Method | URL | Description |
 |---|---|---|
-| `GET` | `/api/search/files` | Full-text path search with category + drive filters |
-| `GET` | `/api/duplicates/summary` | Count of duplicate groups, wasted space |
+| `GET` | `/api/search/files` | Path search with optional `category` + `driveLabel` filters |
+| `GET` | `/api/duplicates/summary` | Count of duplicate groups, total duplicate files, wasted bytes |
 | `GET` | `/api/duplicates/by-hash/{hash}` | All locations for a given SHA-256 hash |
 
-**Files to create**
+#### Sample workflow
+
+```bash
+# Search for files matching a keyword
+curl "http://localhost:5000/api/search/files?query=inception&category=Movie"
+
+# Duplicate summary
+curl http://localhost:5000/api/duplicates/summary
+# → { "totalGroups": 12, "totalDuplicateFiles": 28, "wastedBytes": 9876543210 }
+
+# All copies of a specific hash
+curl http://localhost:5000/api/duplicates/by-hash/abc123...
+```
+
+#### Files added
 ```
 Controllers/
   SearchController.cs
   DuplicatesController.cs
+Dtos/
+  MediaFileDtos.cs   + DuplicateSummaryDto, DuplicateGroupDto
 ```
 
 ---
