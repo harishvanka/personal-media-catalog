@@ -1,0 +1,40 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build outputs
+*.dll
+*.exe
+*.pdb
+*.nupkg
+*.snupkg
+
+## EF Core / SQLite database (local dev data, not for source control)
+*.db
+*.db-shm
+*.db-wal
+
+## Rider / Visual Studio
+.idea/
+.vs/
+*.DotSettings.user
+
+## VS Code
+.vscode/
+
+## OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Debian packages (one-time install artifacts)
+*.deb
+
+## Secrets / config overrides
+appsettings.Development.json
+*.pfx
+*.key
