@@ -211,28 +211,62 @@ Dtos/
 
 ---
 
-### Module 4 — File Organization Engine ⬜ Not started
+### Module 4 — File Organization Engine ✅ Done
 
-**Planned endpoints**
+**Implemented:** 2026-03-09
+
+#### API endpoints
 
 | Method | URL | Description |
 |---|---|---|
-| `GET` | `/api/organize/{fileId}/suggest` | Suggest a clean target path based on filename rules |
-| `POST` | `/api/organize/{fileId}/move` | Move file on disk + update DB (supports `dryRun`) |
+| `GET` | `/api/organize/{fileId}/suggest` | Suggest a clean target path based on naming rules |
+| `POST` | `/api/organize/{fileId}/move` | Move file on disk + update DB; supports `?dryRun=true` |
 
-**Naming rules planned**
-- Movies → `Movies/{Year}/{CleanTitle}.mkv`
-- Documents → `Docs/{ext}/{filename}`
-- Photos → `Photos/{Year}/{filename}`
-- Tutorials → `Tutorials/{Platform}/{CourseName}/…`
+#### Naming rules
 
-**Files to create**
+| Category | Suggested path |
+|---|---|
+| `Movie` | `Movies/{Year}/{Clean Title}.ext` — year extracted from filename; `Movies/Unknown/` if no year found |
+| `Document` | `Docs/{ext}/{filename}` |
+| `Photo` | `Photos/{Year}/{filename}` — year from `CreatedAtFs` / `ModifiedAtFs` |
+| `Tutorial` | `Tutorials/{Platform}/{original sub-path}` — platform detected from path keywords |
+| `Other` | `Other/{filename}` |
+
+#### Behaviour notes
+- `dryRun=true` returns computed source/target paths without touching disk or DB.
+- If the file is already at the suggested location the response is `success: true` with a message.
+- Refuses to overwrite an existing file at the target — returns `success: false` with a clear message.
+- After a real move: `MediaFile.RelativePath` is updated in the DB.
+
+#### Sample workflow
+
+```bash
+# Preview suggestion (no disk writes)
+curl "http://localhost:5000/api/organize/42/suggest"
+# → { "fileId": 42, "currentPath": "D:\\inception.2010.mkv",
+#     "suggestedPath": "D:\\Movies\\2010\\inception .mkv", "alreadyOrganized": false }
+
+# Dry-run the move
+curl -X POST "http://localhost:5000/api/organize/42/move?dryRun=true"
+
+# Actually move the file
+curl -X POST "http://localhost:5000/api/organize/42/move"
+```
+
+#### Files added
 ```
 Services/
   IFileOrganizer.cs
   FileOrganizer.cs
 Controllers/
   OrganizeController.cs
+Dtos/
+  MediaFileDtos.cs   + OrganizeSuggestionDto, MoveResultDto
+```
+
+#### Files modified
+```
+Program.cs   + builder.Services.AddScoped<IFileOrganizer, FileOrganizer>()
 ```
 
 ---

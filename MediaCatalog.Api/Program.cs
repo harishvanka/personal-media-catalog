@@ -14,6 +14,9 @@ builder.Services.AddLogging();
 // ScanJobTracker is singleton: holds in-memory job state across requests
 builder.Services.AddSingleton<ScanJobTracker>();
 
+// Module 4: file organization engine (scoped — uses DbContext)
+builder.Services.AddScoped<IFileOrganizer, FileOrganizer>();
+
 // Register DriveScannerService once as a singleton, then expose it via two interfaces:
 //   - IHostedService  → ASP.NET Core starts/stops it automatically
 //   - IDriveScanner   → controllers call EnqueueAsync()
